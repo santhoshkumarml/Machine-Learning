@@ -16,10 +16,12 @@ class NaiveBayesClassifier:
      pass
  
  def fit(self, X, y):
-     k = set(y)
-     d = X.shape[0]
-     
      self.cpt = numpy.zeros(shape = (),dtype = float32)
+     
+     for row in X:
+         for i in range(d):
+                 pass
+     
  
  def predict(self, X):
      pass
