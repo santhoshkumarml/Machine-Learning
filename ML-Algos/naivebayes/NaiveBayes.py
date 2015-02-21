@@ -8,7 +8,7 @@ import math
 
 class NaiveBayesClassifier:
     def __init__(self):
-        self.jpd = [] #p(x|y)
+        self.cpt = [] #p(x|y)
         self.fp = [] #p(x)
         self.tp = [] #p(y)
  
@@ -45,6 +45,8 @@ class NaiveBayesClassifier:
         probability = {i:0 for i in range(len(self.tp))}
         for i in range(X.shape[0]):
             for j in range(len(self.tp)):
-                calc = self.cpt[i][j]
-                probability[j] += math.log(calc, 10)
+                for k in range(X[i]):
+                    calc = self.cpt[i][j]
+                    probability[j] += math.log(calc, 10)
+                
         return max(probability.iterkeys(), key = lambda key: probability[key])
