@@ -13,11 +13,11 @@ nb.fit(X, y)
 X = datareader.readTestData()
 y = datareader.readTestLabels()
 
-accuracy = 0
+accuracy = 0.0
 
 for i in range(X.shape[0]):
     label = nb.predict(X[i])
     if label == y[i]:
-        accuracy += 1
+        accuracy += 1.0
 
 print accuracy/len(y)
