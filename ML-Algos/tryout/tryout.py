@@ -5,7 +5,7 @@ Created on Feb 20, 2015
 '''
 
 
-import naive-bayes.NaiveBayes.NaiveBayesClassifier as nbclassifier
+from naivebayes.NaiveBayes import NaiveBayesClassifier
 import numpy
 
 train_data = '../train.data'
@@ -39,5 +39,5 @@ for doc_id, word_id, count in data:
     X[doc_id-1][word_id-1] = count
 y = numpy.array(y)
 
-nb = nbclassifier()
+nb = NaiveBayesClassifier()
 nb.fit()
