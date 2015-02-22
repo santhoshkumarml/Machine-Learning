@@ -34,12 +34,12 @@ class NaiveBayesClassifier:
         for j in range(no_of_classes):
             self.tp[j] /= train_samples
             
-        total_words_with_addonesmoothing =  [sum(self.cpt[:,j]) for j in range(no_of_classes)]
+        total_words_with_add_one_smoothing =  [sum(self.cpt[:,j]) for j in range(no_of_classes)]
         
         for i in range(train_features):
             self.fp[i] /= total_words
             for j in range(no_of_classes):
-                self.cpt[i][j] /= total_words_with_addonesmoothing[j]
+                self.cpt[i][j] /= total_words_with_add_one_smoothing[j]
 
     def predict(self, X):
         probability = {i:0 for i in range(len(self.tp))}
