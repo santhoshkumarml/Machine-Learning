@@ -8,9 +8,10 @@ from naivebayes.NaiveBayes import NaiveBayesClassifier
 from logisticregression.LogisticRegression import LogisticRegression
 
 nb = NaiveBayesClassifier()
-lr = LogisticRegression(step_size=0.001)
 
+lr = LogisticRegression(step_size=0.0001)
 X,y = datareader.readTrainDataAndLabels()
+
 #nb.fit(X, y)
 lr.fit(X, y)
 
