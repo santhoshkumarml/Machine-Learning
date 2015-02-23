@@ -5,10 +5,14 @@ Created on Feb 20, 2015
 '''
 from util import datareader
 from naivebayes.NaiveBayes import NaiveBayesClassifier
+from logisticregression.LogisticRegression import LogisticRegression
 
 nb = NaiveBayesClassifier()
+lr = LogisticRegression(step_size=0.001)
+
 X,y = datareader.readTrainDataAndLabels()
-nb.fit(X, y)
+#nb.fit(X, y)
+lr.fit(X, y)
 
 X = datareader.readTestData()
 y = datareader.readTestLabels()
@@ -16,7 +20,7 @@ y = datareader.readTestLabels()
 accuracy = 0.0
 
 for i in range(X.shape[0]):
-    label = nb.predict(X[i])
+    label = lr.predict(X[i])
     if label == y[i]:
         accuracy += 1.0
 

@@ -32,12 +32,11 @@ class LogisticRegression:
      
         # estimate parameters
         self.paramVector = numpy.zeros(shape = (1, train_features+1))
-        log_likelihood = sum([(y[i]-self.calculateHypothesis(X[i])) for i in range(train_samples)])
+        log_likelihood = sum([(y[i]-self.calculateHypothesis(self.paramVector, X[i])) for i in range(train_samples)])
      
         #iterative gradient ascend
         while True:
             paramVector = numpy.zeros(shape = (1, train_features+1))
-            
             
             for j in range(len(self.paramVector)):
                 paramVector[j] = self.paramVector
