@@ -49,23 +49,19 @@ class LogisticRegression:
      
         # estimate parameters
         self.paramVector = numpy.zeros(shape = (1, train_features+1))
-        
         log_likelihood = self.calculateLogLikeliHood(train_samples, X, y, self.paramVector)
         
-        #iterative gradient ascend
+        #iterative gradient ascend and estimate parameters
         while True:
             paramVector = numpy.zeros(shape = (1, train_features+1))
-            
             for j in range(len(self.paramVector)):
-                paramVector[j] = self.paramVector[j]
                 step_factor = 0
                 for i in range(train_samples):
                     step_factor += self.determine_step_factor(j, self.paramVector,\
                                                   X[i], y[i])
-                paramVector[j] += (self.step_size * step_factor)
+                paramVector[j] = self.paramVector[j] + (self.step_size * step_factor)
                 
             new_log_likelihood = self.calculateLogLikeliHood(train_samples, X, y, paramVector)
-            
             if new_log_likelihood < log_likelihood:
                 break
             else:
