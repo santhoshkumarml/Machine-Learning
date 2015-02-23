@@ -4,6 +4,7 @@ Created on Feb 18, 2015
 @author: santhosh
 '''
 import sys
+import math
 import numpy
 
 class LogisticRegression:
@@ -20,7 +21,7 @@ class LogisticRegression:
     def calculateHypothesis(self, paramVector, X):
         changed_X = numpy.insert(X, 0, 1)
         changed_X_t = numpy.transpose(changed_X)
-        return
+        return self.sigmoid(self.paramVector, changed_X_t)
     
     def determine_step_factor(self, j, paramVector, X, y):
         return X[j]*(y - self.calculateExponentOfVectors(paramVector, X))
