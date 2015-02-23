@@ -13,10 +13,11 @@ class LogisticRegression:
         self.step_size = step_size    
         
     def calculateExponentOfVectors(self, paramVector, X):
-        return math.exp(-numpy.dot(paramVector, X))
+        return math.exp(numpy.dot(paramVector, X))
        
     def sigmoid(self,paramVector, X):
-        return  1/(1 + self.calculateExponentOfVectors(paramVector, X))
+        calc = self.calculateExponentOfVectors(paramVector, X)
+        return calc/(1+calc)
     
     def calculateHypothesis(self, paramVector, X):
         changed_X = numpy.insert(X, 0, 1)
@@ -24,7 +25,9 @@ class LogisticRegression:
         return self.sigmoid(self.paramVector, changed_X_t)
     
     def determine_step_factor(self, j, paramVector, X, y):
-        return X[j]*(y - self.calculateExponentOfVectors(paramVector, X))
+        changed_X = numpy.insert(X, 0, 1)
+        changed_X_t = numpy.transpose(changed_X)
+        return X[j]*(y - self.calculateExponentOfVectors(paramVector, changed_X_t))
     
     def fit(self, X, y):
         train_samples,train_features = X.shape
@@ -37,7 +40,6 @@ class LogisticRegression:
         #iterative gradient ascend
         while True:
             paramVector = numpy.zeros(shape = (1, train_features+1))
-            
             for j in range(len(self.paramVector)):
                 paramVector[j] = self.paramVector
                 step_factor = 0
