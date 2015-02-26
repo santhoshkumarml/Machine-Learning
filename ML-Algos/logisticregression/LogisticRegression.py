@@ -30,16 +30,15 @@ class LogisticRegression:
     def getChange_X_AndTranspose(self, X):
         changed_X = self.getChange_X(X)
         changed_X_t = numpy.transpose(changed_X)
-        return changed_X_t
+        return changed_X, changed_X_t
     
     def calculateHypothesis(self, paramVector, X):
-        changed_X_t = self.getChange_X_AndTranspose(X)    
+        changed_X,changed_X_t = self.getChange_X_AndTranspose(X)    
         return self.sigmoid(self.paramVector, changed_X_t)
     
     def determine_step_factor(self, j, paramVector, X, y):
-        changed_X = numpy.insert(X, 0, 1)
-        changed_X_t = numpy.transpose(changed_X)
-        return X[j]*(y - self.calculateExponentOfVectors(paramVector, changed_X_t))
+        changed_X, changed_X_t = self.getChange_X_AndTranspose(X)
+        return changed_X[j]*(y - self.calculateExponentOfVectors(paramVector, changed_X_t))
     
     def calculateLogLikeliHood(self, train_samples, X, y, paramVector):
         log_likelihood_list = []
@@ -58,9 +57,10 @@ class LogisticRegression:
      
         # estimate parameters
         self.paramVector = numpy.zeros(train_features+1)
-        log_likelihood = self.calculateLogLikeliHood(train_samples, X, y, self.paramVector)
+        log_likelihood = -float('inf')
         
         #iterative gradient ascend and estimate parameters
+        
         while True:
             paramVector = numpy.zeros(train_features+1)
             for j in range(train_features+1):
@@ -71,6 +71,9 @@ class LogisticRegression:
                 paramVector[j] = self.paramVector[j] + (self.step_size * step_factor)
                 
             new_log_likelihood = self.calculateLogLikeliHood(train_samples, X, y, paramVector)
+            
+            print new_log_likelihood, log_likelihood
+            
             if new_log_likelihood < log_likelihood:
                 break
             else:

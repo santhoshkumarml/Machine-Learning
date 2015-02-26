@@ -44,8 +44,13 @@ class NaiveBayesClassifier:
     def predict(self, X):
         probability = {i:0 for i in range(len(self.tp))}
         
-        for i in range(X.shape[0]):
+        for i in range(len(X)):
             for j in range(len(self.tp)):
-                    probability[j] += X[i]*math.log(self.cpt[i][j], 10)
+                    # math overflow error was happening if i simply muliply and power the probablities
+                    probability[j] += X[i]*math.log(self.cpt[i][j]) 
+                    
+        for j in range(len(self.tp)):
+            # multiplying p(y)
+            probability[j] = probability[j]+math.log(self.tp[j])
                 
         return max(probability.iterkeys(), key = lambda key: probability[key])
