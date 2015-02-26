@@ -18,10 +18,6 @@ class LogisticRegression:
     
     def calculateExponentOfVectors(self, paramVector, X):
         return math.exp(self.calculateDotProductOfVectors(paramVector, X))
-       
-    def sigmoid(self,paramVector, X):
-        calc = self.calculateExponentOfVectors(paramVector, X)
-        return calc/(1+calc)
     
     def getChange_X(self, X):
         changed_X = numpy.insert(X, 0, 1)
@@ -33,12 +29,15 @@ class LogisticRegression:
         return changed_X, changed_X_t
     
     def calculateHypothesis(self, paramVector, X):
-        changed_X,changed_X_t = self.getChange_X_AndTranspose(X)    
-        return self.sigmoid(self.paramVector, changed_X_t)
+        changed_X,changed_X_t = self.getChange_X_AndTranspose(X)
+        calc = self.calculateExponentOfVectors(paramVector, changed_X_t)
+        return 1/(1+calc)
     
     def determine_step_factor(self, j, paramVector, X, y):
         changed_X, changed_X_t = self.getChange_X_AndTranspose(X)
-        return changed_X[j]*(y - self.calculateExponentOfVectors(paramVector, changed_X_t))
+        calc1 = self.calculateExponentOfVectors(paramVector, changed_X_t)
+        calc2 = calc1/(1+calc1)
+        return changed_X[j]*(y - calc2)
     
     def calculateLogLikeliHood(self, train_samples, X, y, paramVector):
         log_likelihood_list = []
@@ -77,8 +76,11 @@ class LogisticRegression:
             if new_log_likelihood < log_likelihood:
                 break
             else:
+                diff = new_log_likelihood - log_likelihood
                 log_likelihood = new_log_likelihood
                 self.paramVector = paramVector
+                if diff <=0.5:
+                    break
                 
         for i in range(train_features+1):
             print self.paramVector[i]
