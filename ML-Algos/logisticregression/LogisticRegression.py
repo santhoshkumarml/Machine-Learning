@@ -14,40 +14,35 @@ class LogisticRegression:
         self.step_size = step_size    
     
     def calculateDotProductOfVectors(self, paramVector, X):
-        return numpy.dot(paramVector, X)
+        arr = numpy.dot(paramVector, X)
+        return arr.item(0)
     
     def calculateExponentOfVectors(self, paramVector, X):
-        return math.exp(self.calculateDotProductOfVectors(paramVector, X))
+        w_x_t = self.calculateDotProductOfVectors(paramVector, X)
+        return math.exp(w_x_t)
     
-    def getChange_X(self, X):
+    def getChanged_X_AndTranspose(self, X):
         changed_X = numpy.insert(X, 0, 1)
-        return changed_X
-    
-    def getChange_X_AndTranspose(self, X):
-        changed_X = self.getChange_X(X)
         changed_X_t = numpy.transpose(changed_X)
         return changed_X, changed_X_t
     
     def calculateHypothesis(self, paramVector, X):
-        changed_X,changed_X_t = self.getChange_X_AndTranspose(X)
-        calc = self.calculateExponentOfVectors(paramVector, changed_X_t)
-        return 1/(1+calc)
+        changed_X,changed_X_t = self.getChanged_X_AndTranspose(X)
+        exp_w_x_t = self.calculateExponentOfVectors(paramVector, changed_X_t)
+        return 1/(1+exp_w_x_t)
     
-    def determine_step_factor(self, j, paramVector, X, y):
-        changed_X, changed_X_t = self.getChange_X_AndTranspose(X)
-        calc1 = self.calculateExponentOfVectors(paramVector, changed_X_t)
-        calc2 = calc1/(1+calc1)
-        return changed_X[j]*(y - calc2)
+    def determine_diff_likehood(self, x, y, exp_w_x_t):
+        sigmoid = exp_w_x_t/(1 + exp_w_x_t)
+        return x*(y - sigmoid)
     
-    def calculateLogLikeliHood(self, train_samples, X, y, paramVector):
+    def calculateLogLikeliHood(self, X, y, paramVector):
         log_likelihood_list = []
-        for i in range(train_samples):
-            changed_X = numpy.insert(X[i], 0, 1)
-            changed_X_t = numpy.transpose(changed_X)
-            calc = y[i]*(self.calculateDotProductOfVectors(paramVector, changed_X_t))-\
-             math.log(1+self.calculateExponentOfVectors(paramVector, changed_X_t))
+        for i in range(len(y)):
+            changed_X,changed_X_t = self.getChanged_X_AndTranspose(X[i])
+            w_x_t = self.calculateDotProductOfVectors(paramVector, changed_X_t)
+            #0.05584, -0.147, -0.228, -0.248
+            calc = (y[i]*w_x_t)- math.log(1+math.exp(w_x_t))
             log_likelihood_list.append(calc)
-            
         return  sum(log_likelihood_list)
         
     def fit(self, X, y):
@@ -59,32 +54,29 @@ class LogisticRegression:
         log_likelihood = -float('inf')
         
         #iterative gradient ascend and estimate parameters
-        
         while True:
             paramVector = numpy.zeros(train_features+1)
-            for j in range(train_features+1):
-                step_factor = 0
-                for i in range(train_samples):
-                    step_factor += self.determine_step_factor(j, self.paramVector,\
-                                                  X[i], y[i])
-                paramVector[j] = self.paramVector[j] + (self.step_size * step_factor)
+            diff_l_w = numpy.zeros(train_features+1)
+            for sample_idx in range(train_samples):
+                changed_X, changed_X_t = self.getChanged_X_AndTranspose(X[sample_idx])
+                exp_w_x_t = self.calculateExponentOfVectors(self.paramVector, changed_X_t)
+                for param_idx in range(train_features+1):
+                    diff_l_w[param_idx]+= self.determine_diff_likehood(changed_X[param_idx],\
+                                                                        y[sample_idx], exp_w_x_t)
+            
+            for param_idx in range(train_features+1):  
+                paramVector[param_idx] = self.paramVector[param_idx] + (self.step_size * diff_l_w[param_idx])
                 
-            new_log_likelihood = self.calculateLogLikeliHood(train_samples, X, y, paramVector)
+            new_log_likelihood = self.calculateLogLikeliHood(X, y, paramVector)
             
             print new_log_likelihood, log_likelihood
             
             if new_log_likelihood < log_likelihood:
                 break
             else:
-                diff = new_log_likelihood - log_likelihood
                 log_likelihood = new_log_likelihood
                 self.paramVector = paramVector
-                if diff <=0.5:
-                    break
-                
-        for i in range(train_features+1):
-            print self.paramVector[i]
-    
+
     def predict(self, X):
         predicted_value =  self.calculateHypothesis(self.paramVector, X)
-        return (0 if predicted_value >=0.5  else 1)
+        return (0 if predicted_value>=0.5  else 1)

@@ -6,11 +6,19 @@ Created on Feb 20, 2015
 from util import datareader
 from naivebayes.NaiveBayes import NaiveBayesClassifier
 from logisticregression.LogisticRegression import LogisticRegression
+import sys
 
 
 def fitAndPredict(clf):
     X,y = datareader.readTrainDataAndLabels()
     clf.fit(X, y)
+    accuracy = 0.0
+    for i in range(X.shape[0]):
+        label = clf.predict(X[i])
+        if label == y[i]:
+            accuracy += 1.0
+    print accuracy/len(y)
+    sys.exit()
     X = datareader.readTestData()
     y = datareader.readTestLabels()
     accuracy = 0.0
