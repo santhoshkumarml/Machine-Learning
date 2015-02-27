@@ -8,9 +8,10 @@ import math
 import numpy
 
 class LogisticRegression:
-    def __init__(self, step_size):
+    def __init__(self, step_size, threshold=-1):
         self.paramVector = []
-        self.step_size = step_size    
+        self.step_size = step_size
+        self.threshold = threshold
     
     def calculateDotProductOfVectors(self, paramVector, X):
         arr = numpy.dot(paramVector, X)
@@ -66,8 +67,8 @@ class LogisticRegression:
                 
             new_log_likelihood = self.calculateLogLikeliHood(X, y, paramVector)
 
-            if new_log_likelihood < log_likelihood or (new_log_likelihood-log_likelihood) < 0.1:
-                print 'Final Likelihood', new_log_likelihood, log_likelihood
+            if new_log_likelihood < log_likelihood or ((new_log_likelihood-log_likelihood) < self.threshold):
+                #print 'Final Likelihood', new_log_likelihood, log_likelihood
                 break
             else:
                 log_likelihood = new_log_likelihood
