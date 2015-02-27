@@ -12,12 +12,6 @@ import sys
 def fitAndPredict(clf):
     X,y = datareader.readTrainDataAndLabels()
     clf.fit(X, y)
-    accuracy = 0.0
-    for i in range(X.shape[0]):
-        label = clf.predict(X[i])
-        if label == y[i]:
-            accuracy += 1.0
-    print accuracy/len(y)
     X = datareader.readTestData()
     y = datareader.readTestLabels()
     accuracy = 0.0
@@ -25,9 +19,13 @@ def fitAndPredict(clf):
         label = clf.predict(X[i])
         if label == y[i]:
             accuracy += 1.0
-    print accuracy/len(y)
-    
-# nb = NaiveBayesClassifier()
+    print 'Accuracy:'+accuracy/len(y)
+
+print 'Naive Bayes'
+nb = NaiveBayesClassifier()
+fitAndPredict(nb)
+print '-------------------------------------------------------------------------------------------------------------'
+print 'Logistic Regression'
 lr = LogisticRegression(step_size = 0.0001)
 fitAndPredict(lr)
-
+print '-------------------------------------------------------------------------------------------------------------'
