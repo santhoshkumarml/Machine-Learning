@@ -18,7 +18,6 @@ def fitAndPredict(clf):
         if label == y[i]:
             accuracy += 1.0
     print accuracy/len(y)
-    sys.exit()
     X = datareader.readTestData()
     y = datareader.readTestLabels()
     accuracy = 0.0
@@ -28,6 +27,7 @@ def fitAndPredict(clf):
             accuracy += 1.0
     print accuracy/len(y)
     
-nb = NaiveBayesClassifier()
+# nb = NaiveBayesClassifier()
 lr = LogisticRegression(step_size = 0.0001)
 fitAndPredict(lr)
+

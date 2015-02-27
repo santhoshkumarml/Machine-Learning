@@ -6,7 +6,6 @@ Created on Feb 18, 2015
 
 import math
 import numpy
-import sys
 
 class LogisticRegression:
     def __init__(self, step_size):
@@ -40,7 +39,6 @@ class LogisticRegression:
         for i in range(len(y)):
             changed_X,changed_X_t = self.getChanged_X_AndTranspose(X[i])
             w_x_t = self.calculateDotProductOfVectors(paramVector, changed_X_t)
-            #0.05584, -0.147, -0.228, -0.248
             calc = (y[i]*w_x_t)- math.log(1+math.exp(w_x_t))
             log_likelihood_list.append(calc)
         return  sum(log_likelihood_list)
@@ -63,15 +61,13 @@ class LogisticRegression:
                 for param_idx in range(train_features+1):
                     diff_l_w[param_idx]+= self.determine_diff_likehood(changed_X[param_idx],\
                                                                         y[sample_idx], exp_w_x_t)
-            
             for param_idx in range(train_features+1):  
                 paramVector[param_idx] = self.paramVector[param_idx] + (self.step_size * diff_l_w[param_idx])
                 
             new_log_likelihood = self.calculateLogLikeliHood(X, y, paramVector)
-            
-            print new_log_likelihood, log_likelihood
-            
-            if new_log_likelihood < log_likelihood:
+
+            if new_log_likelihood < log_likelihood or (new_log_likelihood-log_likelihood) < 0.1:
+                print 'Final Likelihood', new_log_likelihood, log_likelihood
                 break
             else:
                 log_likelihood = new_log_likelihood
