@@ -6,8 +6,7 @@ Created on Feb 20, 2015
 from util import datareader
 from naivebayes.NaiveBayes import NaiveBayesClassifier
 from logisticregression.LogisticRegression import LogisticRegression
-import sys
-
+from datetime import datetime
 
 def fitAndPredict(clf):
     X,y = datareader.readTrainDataAndLabels()
@@ -19,13 +18,21 @@ def fitAndPredict(clf):
         label = clf.predict(X[i])
         if label == y[i]:
             accuracy += 1.0
-    print 'Accuracy:'+accuracy/len(y)
+    return accuracy
 
 print 'Naive Bayes'
+beforeTime = datetime.now()
 nb = NaiveBayesClassifier()
-fitAndPredict(nb)
+accuracy = fitAndPredict(nb)
+afterTime = datetime.now()
+print 'Time Taken:', afterTime-beforeTime
+print 'Accuracy', accuracy
 print '-------------------------------------------------------------------------------------------------------------'
 print 'Logistic Regression'
+beforeTime = datetime.now()
 lr = LogisticRegression(step_size = 0.0001)
-fitAndPredict(lr)
+accuracy = fitAndPredict(lr)
+afterTime = datetime.now()
+print 'Time Taken:', afterTime-beforeTime
+print 'Accuracy', accuracy
 print '-------------------------------------------------------------------------------------------------------------'
