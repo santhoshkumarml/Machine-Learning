@@ -7,12 +7,14 @@ import numpy
 import math
 
 class NaiveBayesClassifier:
+
     def __init__(self):
         self.cpt = [] #p(x|y)
         self.fp = [] #p(x)
         self.tp = [] #p(y)
  
- 
+
+    # train
     def fit(self, X, y):
         train_samples,train_features = X.shape
         no_of_classes = len(set(y))
@@ -41,6 +43,7 @@ class NaiveBayesClassifier:
             for j in range(no_of_classes):
                 self.cpt[i][j] /= total_words_with_add_one_smoothing[j]
 
+    #test
     def predict(self, X):
         probability = {i:0 for i in range(len(self.tp))}
         

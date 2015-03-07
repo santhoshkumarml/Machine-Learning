@@ -5,10 +5,10 @@ Created on Feb 18, 2015
 '''
 
 import numpy
-train_data = '../train.data'
-train_target = '../train.label'
-test_data = '../test.data'
-test_target = '../test.label'
+train_data = 'train.data'
+train_target = 'train.label'
+test_data = 'test.data'
+test_target = 'test.label'
 
 def read_data(data_file):
     data = []
