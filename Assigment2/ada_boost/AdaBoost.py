@@ -20,7 +20,7 @@ class AdaBoostClassifier(object):
         n_samples, n_features = train_data.shape
         weights = numpy.array([(1.0/n_samples) for i in range(n_samples)])
         for i in range(self.iterations):
-            self.weakClassifiers[i].fit(train_data,train_result, weights)
+            self.weakClassifiers[i].fit(train_data, train_result, weights)
 
     def predict(self, test_data):
         pass
