@@ -3,42 +3,60 @@ import numpy
 import math
 
 
-class DecisionNode(object):
-    def __init__(self):
-        self.feature_idx = -1
-        self.feature_threshold = None
-        self.result_probability = dict()
-        self.childNodes = []
-
-    def fit(self, feature_idx, feature_threshold, result_probability):
-        self.feature_idx = feature_idx
-        self.feature_threshold = feature_threshold
-
-    def getChildNodes(self):
-        return self.childNodes
-
-
 class DecisionStump(object):
     def __init__(self):
-        self.root = (-1, None, dict(), []) #feature_idx, feature_value_threshold, result_instances, child_nodes
+        self.root = (-1, None, None, []) #feature_idx, feature_value_threshold, result_instances, child_nodes
 
-    def determineFeatureIdxAndThreshold(self):
+    def determineFeatureIdxAndThreshold(self, train_data, train_results, weights):
         return -1, -1
 
     def fit(self, train_data, train_results, weights):
-        feature_idx, feature_value_threshold = self.determineFeatureIdxAndThreshold()
+        n_samples, n_features = train_data.shape
+        feature_idx, feature_value_threshold =\
+            self.determineFeatureIdxAndThreshold(train_data,\
+                                                 train_results,\
+                                                 weights)
+
+        total_negative_values, total_positive_values = 0
+
+        for i in range(n_samples):
+            if train_results[i] == 1:
+                total_negative_values+=1
+            else:
+                total_positive_values+=1
+
+        self.root = (feature_idx, feature_value_threshold,(total_negative_values, total_positive_values), [])
         feature_idx, feature_value_threshold, result_instances, child_nodes = self.root
-        child_nodes.append((-1, None, dict(), []))
-        child_nodes.append((-1, None, dict(), []))
+        total_negative_values_for_less, total_positive_values_for_less = 0, 0
+        total_negative_values_for_greater, total_positive_values_for_greater = 0, 0
+
+        for i in range(n_samples):
+            if train_data[feature_idx] < feature_value_threshold:
+                if train_results[i] == 1:
+                    total_negative_values_for_less += 1
+                else:
+                    total_positive_values_for_less += 1
+            else:
+                if train_results[i] == 1:
+                    total_negative_values_for_greater += 1
+                else:
+                    total_positive_values_for_greater += 1
+
+        child_node0 = (-1, None, (total_negative_values_for_less, total_positive_values_for_less), None)
+        child_node1 = (-1, None, (total_negative_values_for_greater, total_positive_values_for_greater), None)
+
+        child_nodes.append(child_node0)
+        child_nodes.append(child_node1)
+        self.root = (feature_idx, feature_value_threshold,(total_negative_values, total_positive_values),child_nodes)
 
     def predict(self, test_data_instance):
         feature_idx, feature_value_threshold, result_instances, child_nodes = self.root
         if test_data_instance[feature_idx] < feature_value_threshold:
             result_instance_counts = child_nodes[0][3]
-            return -1 if result_instance_counts[0]>result_instance_counts[1] else 1
+            return -1 if result_instance_counts[0] > result_instance_counts[1] else 1
         else:
             result_instance_counts = child_nodes[1][3]
-            return -1 if result_instance_counts[0]>result_instance_counts[1] else 1
+            return -1 if result_instance_counts[0] > result_instance_counts[1] else 1
 
 
 class AdaBoostClassifier(object):
@@ -69,5 +87,5 @@ class AdaBoostClassifier(object):
     def predict(self, test_data_instance):
         final_value = 0
         for i in range(self.iterations):
-            final_value += self.alphas[i]* self.weakClassifiers[i].predict(test_data_instance)
-        return -1 if final_value < 0 else 1
+            final_value += self.alphas[i]*self.weakClassifiers[i].predict(test_data_instance)
+        return 1 if final_value < 0 else 2
