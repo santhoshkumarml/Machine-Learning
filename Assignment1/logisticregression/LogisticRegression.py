@@ -9,7 +9,7 @@ import numpy
 
 class LogisticRegression:
     # Threshold is set to 0.1 to make the convergence stop after the threshold
-    def __init__(self, step_size=0.0001, threshold= 0.1):
+    def __init__(self, step_size=0.0001, threshold= 0.001):
         self.paramVector = []
         self.step_size = step_size
         self.threshold = threshold
@@ -49,7 +49,7 @@ class LogisticRegression:
             w_x_t = self.calculateDotProductOfVectors(paramVector, changed_X_t)
             calc = (y[i]*w_x_t)- math.log(1+math.exp(w_x_t))
             log_likelihood_list.append(calc)
-        return  sum(log_likelihood_list)
+        return sum(log_likelihood_list)/len(y)
 
     # train
     def fit(self, X, y):
