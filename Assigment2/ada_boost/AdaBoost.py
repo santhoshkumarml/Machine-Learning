@@ -31,7 +31,7 @@ class AdaBoostClassifier(object):
             training_error = float(sum(training_error_results))/n_samples
             inner_calc_for_alpha = (1-training_error)/training_error
             self.alphas[i] = 0.5*math.log(inner_calc_for_alpha, math.exp(1))
-            #redetermine weights for next round
+            # redetermine weights for next round
             new_weights = [weights[i]*\
                            math.exp(-1*self.alphas[i]*train_result[i]*\
                                     self.weakClassifiers[i].predict(train_data[i]))\
