@@ -3,15 +3,42 @@ import numpy
 import math
 
 
+class DecisionNode(object):
+    def __init__(self):
+        self.feature_idx = -1
+        self.feature_threshold = None
+        self.result_probability = dict()
+        self.childNodes = []
+
+    def fit(self, feature_idx, feature_threshold, result_probability):
+        self.feature_idx = feature_idx
+        self.feature_threshold = feature_threshold
+
+    def getChildNodes(self):
+        return self.childNodes
+
+
 class DecisionStump(object):
     def __init__(self):
-        pass
+        self.root = (-1, None, dict(), []) #feature_idx, feature_value_threshold, result_instances, child_nodes
+
+    def determineFeatureIdxAndThreshold(self):
+        return -1, -1
 
     def fit(self, train_data, train_results, weights):
-        pass
+        feature_idx, feature_value_threshold = self.determineFeatureIdxAndThreshold()
+        feature_idx, feature_value_threshold, result_instances, child_nodes = self.root
+        child_nodes.append((-1, None, dict(), []))
+        child_nodes.append((-1, None, dict(), []))
 
     def predict(self, test_data_instance):
-        pass
+        feature_idx, feature_value_threshold, result_instances, child_nodes = self.root
+        if test_data_instance[feature_idx] < feature_value_threshold:
+            result_instance_counts = child_nodes[0][3]
+            return -1 if result_instance_counts[0]>result_instance_counts[1] else 1
+        else:
+            result_instance_counts = child_nodes[1][3]
+            return -1 if result_instance_counts[0]>result_instance_counts[1] else 1
 
 
 class AdaBoostClassifier(object):
