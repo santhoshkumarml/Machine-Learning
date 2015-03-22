@@ -14,5 +14,8 @@ class AdaBoostClassifier(object):
         self.weighted_data = numpy.column_stack((train_data,weights))
         self.results = train_result
 
+    def fit(self):
+        pass
+
     def predict(self, test_data):
         print self.weighted_data.shape, self.results.shape
