@@ -9,6 +9,9 @@ class DecisionStump(object):
     def fit(self, train_data, train_results, weights):
         pass
 
+    def predict(self, test_data_instance):
+        pass
+
 
 class AdaBoostClassifier(object):
     def __init__(self,iterations=100):
@@ -22,5 +25,8 @@ class AdaBoostClassifier(object):
         for i in range(self.iterations):
             self.weakClassifiers[i].fit(train_data, train_result, weights)
 
-    def predict(self, test_data):
-        pass
+    def predict(self, test_data_instance):
+        final_value = 0
+        for i in range(self.iterations):
+            final_value += self.alphas[i]* self.weakClassifiers[i].predict(test_data_instance)
+        return -1 if final_value < 0 else 1
