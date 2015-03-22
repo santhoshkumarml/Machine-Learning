@@ -15,7 +15,7 @@ class DecisionStump(object):
 
 
 class AdaBoostClassifier(object):
-    def __init__(self,iterations=100):
+    def __init__(self, iterations=100):
         self.iterations = iterations
         self.weakClassifiers = [DecisionStump() for i in range(self.iterations)]
         self.alphas = numpy.zeros(self.iterations)
