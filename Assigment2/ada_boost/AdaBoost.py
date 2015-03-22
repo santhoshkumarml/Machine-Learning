@@ -47,7 +47,9 @@ class DecisionStump(object):
 
         child_nodes.append(child_node0)
         child_nodes.append(child_node1)
-        self.root = (feature_idx, feature_value_threshold,(total_negative_values, total_positive_values),child_nodes)
+        self.root = (feature_idx, feature_value_threshold,\
+                     (total_negative_values, total_positive_values),\
+                     child_nodes)
 
     def predict(self, test_data_instance):
         feature_idx, feature_value_threshold, result_instances, child_nodes = self.root
