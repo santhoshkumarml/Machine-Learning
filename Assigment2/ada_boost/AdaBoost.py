@@ -17,7 +17,7 @@ class AdaBoostClassifier(object):
         self.alphas = numpy.zeros(self.iterations)
 
     def fit(self, train_data, train_result):
-        n_samples,n_features = train_data.shape
+        n_samples, n_features = train_data.shape
         weights = numpy.array([(1.0/n_samples) for i in range(n_samples)])
         for i in range(self.iterations):
             self.weakClassifiers[i].fit(train_data,train_result, weights)
