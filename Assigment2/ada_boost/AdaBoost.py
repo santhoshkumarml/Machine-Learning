@@ -1,9 +1,11 @@
 __author__ = 'santhosh'
 import numpy
 
+
 class DecisionStump(object):
     def __init__(self, data):
         pass
+
 
 class AdaBoostClassifier(object):
     def __init__(self, train_data, train_result):
