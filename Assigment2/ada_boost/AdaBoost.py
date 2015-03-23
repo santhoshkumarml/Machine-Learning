@@ -44,7 +44,7 @@ class DecisionStump(object):
 
     def determineFeatureIdxAndThreshold(self, train_data, train_results, weights):
         n_samples, n_features = train_data.shape
-        max_weighted_classification_error = [(float('inf'), -1) for i in range(n_features)]
+        weighted_classification_error = [(float('inf'), -1) for i in range(n_features)]
         for i in range(n_features):
             train_data_for_feature = train_data[:, i]
             min_val = min(train_data_for_feature)
@@ -56,11 +56,11 @@ class DecisionStump(object):
                     prediction = self.predict_with_root(root, train_data[j])
                     if prediction != self.getTrainResultClass(train_results[j]):
                         error += weights[j]
+                if error < weighted_classification_error[i][0]:
+                    weighted_classification_error[i] = (error, step_val)
 
-                if error < max_weighted_classification_error[i][0]:
-                    max_weighted_classification_error[i] = (error, step_val)
-        optimal_feature_idx = min(range(n_features), key = lambda idx: max_weighted_classification_error[idx][0])
-        optimal_feature_threshold = max_weighted_classification_error[optimal_feature_idx][1]
+        optimal_feature_idx = min(range(n_features), key = lambda idx: weighted_classification_error[idx][0])
+        optimal_feature_threshold = weighted_classification_error[optimal_feature_idx][1]
         return optimal_feature_idx, optimal_feature_threshold
 
     def fit(self, train_data, train_results, weights):
