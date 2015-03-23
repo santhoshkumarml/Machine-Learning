@@ -10,9 +10,17 @@ class DecisionStump(object):
 
     def determineFeatureIdxAndThreshold(self, train_data, train_results, weights):
         n_samples, n_features = train_data.shape
-        choice_feature_idx = random.choice(range(n_features))
-        choice_feature_threshold = numpy.mean(train_data[:,choice_feature_idx])
-        return choice_feature_idx, choice_feature_threshold
+        optimal_feature_idx, optimal_feature_threshold = None, None
+        min_weighted_classification_accuracy = float('inf')
+        for i in range(n_features):
+            train_data_for_feature = train_data[:, i]
+            train_result_for_feature = numpy.array(train_results)
+            weighted_classification_accuracy = None
+            if weighted_classification_accuracy <= min_weighted_classification_accuracy:
+                min_weighted_classification_accuracy = weighted_classification_accuracy
+                optimal_feature_idx = i
+                optimal_feature_threshold = None
+        return optimal_feature_idx, optimal_feature_threshold
 
     def fit(self, train_data, train_results, weights):
         n_samples, n_features = train_data.shape
@@ -86,6 +94,7 @@ class AdaBoostClassifier(object):
                                            self.weakClassifiers[t].predict(train_data[i])\
                                           else 0 for i in range(n_samples)]
             training_error = float(sum(training_error_results))/n_samples
+            print training_error
             inner_calc_for_alpha = (1-training_error)/training_error
             self.alphas[t] = 0.5*math.log(inner_calc_for_alpha, math.exp(1))
             # redetermine weights for next round
