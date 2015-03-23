@@ -11,4 +11,8 @@ import numpy
 # test_data = train_data
 # test_result = train_result
 adc = AdaBoostClassifier()
-adc.fitPredictAndScore(train_data, train_result, test_data, test_result)
+
+train_error_for_this_sample, test_error_for_this_sample = \
+    adc.fitPredictAndScore(train_data, train_result, test_data, test_result)
+
+print train_error_for_this_sample, test_error_for_this_sample

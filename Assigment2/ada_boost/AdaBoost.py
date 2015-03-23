@@ -45,11 +45,12 @@ class DecisionStump(object):
     def determineFeatureIdxAndThreshold(self, train_data, train_results, weights):
         n_samples, n_features = train_data.shape
         weighted_classification_error = [(float('inf'), -1) for i in range(n_features)]
+        step = 1
         for i in range(n_features):
             train_data_for_feature = train_data[:, i]
             min_val = min(train_data_for_feature)
             max_val = max(train_data_for_feature)
-            for step_val in numpy.arange(min_val, max_val+0.5, 0.5):
+            for step_val in numpy.arange(min_val, max_val+step, step):
                 error = 0
                 root = self.buildStump(i, step_val, train_data, train_results)
                 for j in range(n_samples):
@@ -59,6 +60,7 @@ class DecisionStump(object):
                 if error < weighted_classification_error[i][0]:
                     weighted_classification_error[i] = (error, step_val)
 
+        print weighted_classification_error
         optimal_feature_idx = min(range(n_features), key = lambda idx: weighted_classification_error[idx][0])
         optimal_feature_threshold = weighted_classification_error[optimal_feature_idx][1]
         return optimal_feature_idx, optimal_feature_threshold
@@ -106,8 +108,10 @@ class AdaBoostClassifier(object):
         return '1' if final_value < 0 else '2'
 
     def fitPredictAndScore(self, train_data, train_result, test_data, test_result):
+
         n_samples, n_features = train_data.shape
         weights = numpy.array([(1.0/n_samples) for i in range(n_samples)])
+        training_error_in_iterations, test_error_in_iterations = [],[]
 
         for t in range(self.iterations):
             self.weakClassifiers[t].fit(train_data, train_result, weights)
@@ -118,6 +122,7 @@ class AdaBoostClassifier(object):
                                           else 0 for i in range(n_samples)]
             training_error = sum(training_error_results)
             print 'Weighted Training Error on iter ', t, ':', training_error
+            training_error_in_iterations.append(training_error)
             inner_calc_for_alpha = (1-training_error)/training_error
             self.alphas[t] = 0.5*math.log(inner_calc_for_alpha, math.exp(1))
             # redetermine weights for next round
@@ -135,6 +140,8 @@ class AdaBoostClassifier(object):
                 prediction = self.predict(test_data_ins, iter = t+1)
                 if prediction != test_result_ins:
                     error += 1
-            print 'Test Error on iter ', t, ':', float(error)/len(test_data)
-        print 'Alphas:', self.alphas
+            test_error = float(error)/len(test_data)
+            print 'Test Error on iter ', t, ':', test_error
+            test_error_in_iterations.append(test_error)
+        return training_error_in_iterations, test_error_in_iterations
 
