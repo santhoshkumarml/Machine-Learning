@@ -4,8 +4,11 @@ from util import data_reader
 from ada_boost.AdaBoost import AdaBoostClassifier
 
 train_data, train_result, test_data, test_result = data_reader.read_data()
+import numpy
+# train_data = numpy.array([[2,0],[2,2],[1,1],[3,1]])
+# train_data = numpy.array([[0,-1],[0,1],[1,0],[-1,0]])
+# train_result = numpy.array(['1','1','2','2'])
+# test_data = train_data
+# test_result = train_result
 adc = AdaBoostClassifier()
-adc.fit(train_data, train_result)
-for i in range(len(test_data)):
-    result = adc.predict(test_data[i])
-    print result, test_result[i]
+adc.fitPredictAndScore(train_data, train_result, test_data, test_result)

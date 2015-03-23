@@ -2,9 +2,10 @@ __author__ = 'santhosh'
 
 import csv
 import numpy
+import random
 
 
-def read_data():
+def read_data(data_split = 0.9):
     with open('../bupa.data','r') as f:
         csv_data = csv.reader(f, delimiter=',')
         data = []
@@ -15,8 +16,18 @@ def read_data():
         data = numpy.array(data, dtype=float)
         result = numpy.array(result)
         n_samples, n_features = data.shape
-        train_sample_size = int(n_samples*0.9)
-        train_data, train_result = data[:train_sample_size],result[:train_sample_size]
-        test_data, test_result = data[train_sample_size:],result[train_sample_size:]
-        return train_data, train_result, test_data, test_result
+        train_sample_size = int(n_samples*data_split)
+        random_indexes_for_train = random.sample(xrange(n_samples), train_sample_size)
+        random_indexes_for_test = list(set(range(1,n_samples))-set(random_indexes_for_train))
+
+        train_data,train_result, test_data, test_result = [], [], [], []
+
+        for i in random_indexes_for_train:
+            train_data.append(data[i])
+            train_result.append(result[i])
+        for i in random_indexes_for_test:
+            test_data.append(data[i])
+            test_result.append(result[i])
+
+        return numpy.array(train_data), numpy.array(train_result), numpy.array(test_data), numpy.array(test_result)
 
