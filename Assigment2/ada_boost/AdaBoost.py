@@ -98,7 +98,7 @@ class AdaBoostClassifier(object):
     def getTrainResultClass(self, train_result_value):
         return -1 if train_result_value == '1' else 1
 
-    def predict(self, test_data_instance, iter = -1):
+    def predict(self, test_data_instance, iter=-1):
         final_value = 0
         if iter == -1:
             iter = self.iterations
@@ -136,7 +136,7 @@ class AdaBoostClassifier(object):
             for tidx in range(len(test_data)):
                 test_data_ins = test_data[tidx]
                 test_result_ins = test_result[tidx]
-                prediction = self.predict(test_data_ins, iter = t+1)
+                prediction = self.predict(test_data_ins, iter=t+1)
                 if prediction != test_result_ins:
                     error += 1
             test_error = float(error)/len(test_data)
