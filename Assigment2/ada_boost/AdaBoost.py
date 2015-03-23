@@ -21,9 +21,9 @@ class DecisionStump(object):
 
         for i in range(n_samples):
             if train_results[i] == 1:
-                total_negative_values+=1
+                total_negative_values += 1
             else:
-                total_positive_values+=1
+                total_positive_values += 1
 
         self.root = (feature_idx, feature_value_threshold,(total_negative_values, total_positive_values), [])
         feature_idx, feature_value_threshold, result_instances, child_nodes = self.root
