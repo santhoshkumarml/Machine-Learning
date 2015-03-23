@@ -1,7 +1,6 @@
 __author__ = 'santhosh'
 import numpy
 import math
-import random
 
 
 class DecisionStump(object):
