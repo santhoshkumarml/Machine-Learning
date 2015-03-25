@@ -21,6 +21,7 @@ def read_data(data_split = 0.9):
         # random_indexes_for_test = list(set(range(n_samples))-set(random_indexes_for_train))
         random_indexes_for_train = random.sample(xrange(n_samples), train_sample_size)
         random_indexes_for_test = list(set(range(n_samples))-set(random_indexes_for_train))
+
         train_data, train_result, test_data, test_result = [], [], [], []
 
         for i in random_indexes_for_train:
