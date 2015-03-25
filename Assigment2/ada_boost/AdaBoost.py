@@ -14,17 +14,18 @@ class DecisionStump(object):
         n_samples, n_features = train_data.shape
         root1 = (feature_idx, feature_value_threshold, (-1, 1))
         root2 = (feature_idx, feature_value_threshold, (1, -1))
-        error_for_root1, error_for_root2 = 0, 0
+        misclassified_for_root1, misclassified_for_root2 = 0, 0
         weighted_error_for_root1, weighted_error_for_root2 = 0, 0
         for i in range(n_samples):
             if self.getTrainResultClass(train_results[i]) != self.predict_with_root(root1, train_data[i]):
-                error_for_root1 += 1
+                misclassified_for_root1 += 1
                 weighted_error_for_root1 += weights[i]
             if self.getTrainResultClass(train_results[i]) != self.predict_with_root(root2, train_data[i]):
-                error_for_root2 += 1
+                misclassified_for_root2 += 1
                 weighted_error_for_root2 += weights[i]
-        root = root1 if error_for_root1 < error_for_root2 else root2
-        weighted_error = weighted_error_for_root1 if error_for_root1 < error_for_root2 else weighted_error_for_root2
+
+        root = root1 if misclassified_for_root1 < misclassified_for_root2 else root2
+        weighted_error = weighted_error_for_root1 if misclassified_for_root1 < misclassified_for_root2 else weighted_error_for_root2
         return root, weighted_error
 
     def determineBestStump(self, train_data, train_results, weights):
@@ -38,9 +39,7 @@ class DecisionStump(object):
                 root, error = self.buildStump(feature_idx, step_val, train_data, train_results, weights)
                 if error < min_weighted_classification_error[0]:
                     min_weighted_classification_error= (error, root)
-            #print 'all weighted errors for feature', feature_idx, errors_for_each_step_val, min(errors_for_each_step_val, key=lambda e: e[0])
-
-        #print weighted_classification_error
+        #print min_weighted_classification_error
         error, root = min_weighted_classification_error
         return root, error
 
@@ -95,16 +94,16 @@ class AdaBoostClassifier(object):
                 error += 1
         error = float(error) / len(data)
         return error
+    #
+    # def calculatedWeightedTrainingError(self, t, train_data, train_result, weights):
+    #     n_samples, n_features = train_data.shape
+    #     weighted_training_error = 0
+    #     for i in range(n_samples):
+    #         if self.weakClassifiers[t].predict(train_data[i]) != self.getTrainResultClass(train_result[i]):
+    #             weighted_training_error += weights[i]
+    #     return weighted_training_error
 
-    def calculatedWeightedTrainingError(self, t, train_data, train_result, weights):
-        n_samples, n_features = train_data.shape
-        weighted_training_error = 0
-        for i in range(n_samples):
-            if self.weakClassifiers[t].predict(train_data[i]) != self.getTrainResultClass(train_result[i]):
-                weighted_training_error += weights[i]
-        return weighted_training_error
-
-    def fitPredictAndScore(self, train_data, train_result, test_data, test_result, showDecisionStump = []):
+    def fitPredictAndScore(self, train_data, train_result, test_data, test_result, showDecisionStump = [], calc_error_each_iter= False):
         n_samples, n_features = train_data.shape
         weights = numpy.array([(1.0/n_samples) for i in range(n_samples)])
         training_error_in_iterations, test_error_in_iterations = [], []
@@ -112,6 +111,7 @@ class AdaBoostClassifier(object):
         for t in range(self.iterations):
             #print 'Weights of samples in this iteration', weights
             weighted_training_error = self.weakClassifiers[t].fit(train_data, train_result, weights)
+            #print 'iter:', t,
             if t in showDecisionStump:
                 print 'Decision Stump at iter', t, ':', self.weakClassifiers[t].printStump()
             # determine alpha_t
@@ -140,11 +140,12 @@ class AdaBoostClassifier(object):
 
             weights = numpy.array([new_weights[i]/z_t for i in range(n_samples)])
             self.z_t_s[t] = z_t
-            training_error = self.measureError(t, train_data, train_result)
-            training_error_in_iterations.append(training_error)
-            print 'Overall Train Error on iter ', t, ':', training_error
-            if len(test_data) > 0:
-                test_error = self.measureError(t, test_data, test_result)
-                #print 'Overall Test Error on iter ', t, ':', test_error
-                test_error_in_iterations.append(test_error)
+            if calc_error_each_iter:
+                training_error = self.measureError(t, train_data, train_result)
+                training_error_in_iterations.append(training_error)
+                # print 'Overall Train Error on iter ', t, ':', training_error
+                if len(test_data) > 0:
+                    test_error = self.measureError(t, test_data, test_result)
+                    #print 'Overall Test Error on iter ', t, ':', test_error
+                    test_error_in_iterations.append(test_error)
         return training_error_in_iterations, test_error_in_iterations
