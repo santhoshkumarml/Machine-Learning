@@ -6,7 +6,7 @@ import random
 
 
 def read_data(data_split = 0.9):
-    with open('../bupa.data','r') as f:
+    with open('bupa.data','r') as f:
         csv_data = csv.reader(f, delimiter=',')
         data = []
         result = []

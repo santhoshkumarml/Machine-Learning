@@ -50,10 +50,11 @@ class DecisionStump(object):
 
     def predict_with_root(self, root, test_data_instance):
         feature_idx, feature_value_threshold, child_leaves = root
-        return child_leaves[0] if test_data_instance[feature_idx] <= feature_value_threshold else child_leaves[1]
+        return child_leaves[0] if test_data_instance[feature_idx] < feature_value_threshold else child_leaves[1]
 
     def predict(self, test_data_instance):
         return self.predict_with_root(self.root, test_data_instance)
+
 
     def getRoot(self):
         return self.root
@@ -76,13 +77,18 @@ class AdaBoostClassifier(object):
     def getTrainResultClass(self, train_result_value):
         return -1 if train_result_value == '1' else 1
 
-    def predict(self, test_data_instance, iter=-1):
+    def predict_with_alphas(self, alphas, iter, test_data_instance):
         final_value = 0
         if iter == -1:
             iter = self.iterations
         for t in range(iter):
-            final_value += self.alphas[t]*self.weakClassifiers[t].predict(test_data_instance)
+            current_classifier_prediction = alphas[t] * self.weakClassifiers[t].predict(test_data_instance)
+            final_value += current_classifier_prediction
         return '1' if final_value < 0 else '2'
+
+    def predict(self, test_data_instance, iter=-1):
+        alphas = self.alphas
+        return self.predict_with_alphas(alphas, iter, test_data_instance)
 
     def measureError(self, t, data, result):
         error = 0
@@ -103,7 +109,19 @@ class AdaBoostClassifier(object):
     #             weighted_training_error += weights[i]
     #     return weighted_training_error
 
-    def fitPredictAndScore(self, train_data, train_result, test_data, test_result, showDecisionStump = [], calc_error_each_iter= False):
+    def calculateTrainAndTestError(self, t, train_data, train_result, test_data, test_result,
+                                   training_error_in_iterations, test_error_in_iterations):
+        training_error = self.measureError(t, train_data, train_result)
+        training_error_in_iterations.append(training_error)
+        # print 'Overall Train Error on iter ', t, ':', training_error
+        if len(test_data) > 0:
+            test_error = self.measureError(t, test_data, test_result)
+            # print 'Overall Test Error on iter ', t, ':', test_error
+            test_error_in_iterations.append(test_error)
+
+    def fitPredictAndScore(self, train_data, train_result, test_data, test_result,\
+                           showDecisionStump = [], calc_error_each_iter= False,\
+                           calc_cum_distribution_of_margin = False):
         n_samples, n_features = train_data.shape
         weights = numpy.array([(1.0/n_samples) for i in range(n_samples)])
         training_error_in_iterations, test_error_in_iterations = [], []
@@ -114,6 +132,7 @@ class AdaBoostClassifier(object):
             #print 'iter:', t,
             if t in showDecisionStump:
                 print 'Decision Stump at iter', t, ':', self.weakClassifiers[t].printStump()
+
             # determine alpha_t
             #weighted_training_error = self.calculatedWeightedTrainingError(t, train_data, train_result, weights)#print 'Weighted Training Error on iter ', t, ':', weighted_training_error
             inner_calc_for_alpha = (1-weighted_training_error)/weighted_training_error
@@ -128,7 +147,6 @@ class AdaBoostClassifier(object):
                                                      self.getTrainResultClass(train_result[i])*\
                                                      self.weakClassifiers[t].predict(train_data[i]))
                 # print i, weights[i], new_weights[i]
-
             z_t = sum(new_weights)
             #
             # for i in range(n_samples):
@@ -141,11 +159,6 @@ class AdaBoostClassifier(object):
             weights = numpy.array([new_weights[i]/z_t for i in range(n_samples)])
             self.z_t_s[t] = z_t
             if calc_error_each_iter:
-                training_error = self.measureError(t, train_data, train_result)
-                training_error_in_iterations.append(training_error)
-                # print 'Overall Train Error on iter ', t, ':', training_error
-                if len(test_data) > 0:
-                    test_error = self.measureError(t, test_data, test_result)
-                    #print 'Overall Test Error on iter ', t, ':', test_error
-                    test_error_in_iterations.append(test_error)
+                self.calculateTrainAndTestError(t, train_data, train_result, test_data, test_result,
+                                                training_error_in_iterations, test_error_in_iterations)
         return training_error_in_iterations, test_error_in_iterations
