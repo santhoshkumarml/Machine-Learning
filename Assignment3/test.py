@@ -5,16 +5,6 @@ import os
 from knnclassifier import KNNClassifier
 import numpy
 
-def measureAccuracyOnTestData(knnClassifier):
-    global accuracy, i, label
-    accuracy = 0.0
-    for i in range(len(test_data)):
-        label = knnClassifier.predict(test_data[i])
-        if label == test_result[i]:
-            accuracy += 1.0
-    accuracy /= len(test_data)
-    print accuracy
-
 
 def extractData():
     matlab_data = scipy.io.loadmat(os.path.join(os.getcwd(), 'resources/faces.mat'))
@@ -26,5 +16,4 @@ def extractData():
 
 train_data, train_result, test_data, test_result = extractData()
 knnClassifier = KNNClassifier(range(1,100), 10)
-knnClassifier.fit(train_data, train_result)
-measureAccuracyOnTestData(knnClassifier)
+knnClassifier.fitPredictAndScore(train_data, train_result, test_data, test_result)
