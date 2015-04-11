@@ -2,7 +2,7 @@ __author__ = 'santhosh'
 
 import scipy.io
 import os
-from knn import KNN
+from knnclassifier import KNNClassifier
 import numpy
 
 def measureAccuracyOnTestData(knnClassifier):
@@ -25,6 +25,6 @@ def extractData():
     return train_data, train_result, test_data, test_result
 
 train_data, train_result, test_data, test_result = extractData()
-knnClassifier = KNN(range(1,100), 10)
+knnClassifier = KNNClassifier(range(1,100), 10)
 knnClassifier.fit(train_data, train_result)
 measureAccuracyOnTestData(knnClassifier)

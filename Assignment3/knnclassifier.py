@@ -18,7 +18,7 @@ def plotErrorForK(ks,errors):
                  bbox_inches="tight")
     plt.close()
 
-class KNN(object):
+class KNNClassifier(object):
     def __init__(self, possible_k_values, cross_validation_fold):
         self.train_data = []
         self.train_sample_pair_wise_distance_matrix = {}
