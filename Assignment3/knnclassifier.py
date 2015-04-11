@@ -15,6 +15,10 @@ def plotErrorForK(ks, errors, train_errors, test_errors):
     ax.plot(ks, train_errors, label='Train Error', color='b')
     ax.plot(ks, test_errors, label='Test Error', color='g')
     imgFile = os.path.join(os.getcwd(), "Error plot")+'.png'
+    art = []
+    lgd = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1))
+    art.append(lgd)
+    plt.tight_layout()
     print "Error plot logged to "+imgFile
     plt.savefig(imgFile,\
                  bbox_inches="tight")
@@ -27,7 +31,6 @@ class KNNClassifier(object):
         self.train_result = []
         self.nFold = cross_validation_fold
         self.possible_k_values = possible_k_values
-        self.k = -1
 
     def cosine_distance(self,x,y):
         denom = numpy.sqrt(numpy.dot(x,x)*numpy.dot(y,y))
@@ -43,9 +46,7 @@ class KNNClassifier(object):
                 key = lambda key : neighbor_distances[key])
             self.train_sample_pair_wise_distance_matrix[i] = neighbor_distances
         
-    def findKNearestNeigbors(self, x, k = None):
-        if k == None:
-            k = self.k
+    def findKNearestNeigbors(self, x, k):
         n_samples, n_features = self.train_data.shape
         neighbor_distances_dict = dict()
         for i in range(n_samples):
@@ -95,9 +96,9 @@ class KNNClassifier(object):
             train_error /= n_samples
             train_error_for_each_k.append(train_error)
 
-        self.k = min(cross_validation_error_for_each_k.keys(),\
-            key = lambda key: cross_validation_error_for_each_k[key])
-        print 'Minimum error with k: ', self.k
+        # self.k = min(cross_validation_error_for_each_k.keys(),\
+        #     key = lambda key: cross_validation_error_for_each_k[key])
+        # print 'Minimum error with k: ', self.k
 
         return cross_validation_error_for_each_k.values(), train_error_for_each_k
 
@@ -109,31 +110,39 @@ class KNNClassifier(object):
             if label not in class_labels:
                 class_labels[label] = 0
             class_labels[label] += 1
-        return max(class_labels.keys(), key = lambda key: class_labels[key])
+        return max(class_labels.keys(), key=lambda key: class_labels[key])
 
-    def predict(self, x, k=None):
-        if k == None:
-            k = self.k
+    def predict(self, x, k):
         knn = self.findKNearestNeigbors(x, k)
         return self.getMajorityClassLabelsForKNN(knn, self.train_data, self.train_result)
 
-    def predictAndScore(self, data, result, k=None):
+    def score(self, labels, result, k):
         error = 0.0
-        for i in range(len(data)):
-            label = self.predict(data[i], k)
-            if label != result[i]:
+        for i in range(len(labels)):
+            if labels[i] != result[i]:
                 error += 1.0
-        error /= len(data)
+        error /= len(labels)
         return error
 
     def fitPredictAndScore(self, train_data, train_result, test_data, test_result):
         self.train_data = train_data
+        n_samples, n_features = self.train_data.shape
+
         self.train_result = train_result
         self.calculatePairWiseDistanceForTrainSamples()
+
         cross_validation_error_for_each_k, train_error_for_each_k = self.doNFoldCrossValidationAndMeasureK()
         test_error_for_each_k = []
+        knn_for_test_data = {}
+
+        for test_idx in range(len(test_data)):
+            knn_for_test_data[test_idx] = self.findKNearestNeigbors(test_data[test_idx], k=n_samples)
+
         for k in self.possible_k_values:
-            test_error = self.predictAndScore(test_data, test_result, k)
+            labels = [self.getMajorityClassLabelsForKNN(knn_for_test_data[test_idx][:k],\
+                                                        self.train_data, self.train_result)\
+                      for test_idx in range(len(test_data))]
+            test_error = self.score(labels, test_result)
             test_error_for_each_k.append(test_error)
         plotErrorForK(self.possible_k_values, cross_validation_error_for_each_k,\
                       train_error_for_each_k, test_error_for_each_k)
