@@ -34,7 +34,6 @@ class KNN(object):
                                   for j in range(n_samples) if i != j}
             neighbor_distances = sorted(list(neighbor_distances.keys()), key = lambda key : neighbor_distances[key])
             self.train_sample_pair_wise_distance_matrix[i] = neighbor_distances
-
         
     def findKNearestNeigbors(self, x, k = None):
         if k == None:
@@ -59,6 +58,7 @@ class KNN(object):
             error = 0
             for i in range(len(test_idx_for_each_iter)):
                 start, end = test_idx_for_each_iter[i]
+                print start, end
                 train_data_for_iter, train_result_for_iter = [],[]
                 for sample_idx in range(n_samples):
                     if sample_idx<start or sample_idx>=end:
@@ -72,7 +72,8 @@ class KNN(object):
                     if label != test_label:
                         error +=1
             train_error_for_each_k[k] = error
-        plotErrorForK(self.possible_k_values, train_error_for_each_k)
+        print train_error_for_each_k
+        #plotErrorForK(self.possible_k_values, train_error_for_each_k)
 
 
     def fit(self, X, y):
