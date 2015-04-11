@@ -12,3 +12,10 @@ test_data = matlab_data['testdata']
 test_result = numpy.array([labels[0] for labels in matlab_data['testlabels']])
 knnClassifier = KNN(range(1,100), 10)
 knnClassifier.fit(train_data, train_result)
+accuracy = 0.0
+for i in range(len(test_data)):
+    label = knnClassifier.predict(test_data[i])
+    if label == test_result[i]:
+        accuracy += 1.0
+accuracy /= len(test_data)
+print accuracy

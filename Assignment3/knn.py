@@ -65,13 +65,14 @@ class KNN(object):
                         train_result_for_iter.append(self.train_result[sample_idx])
                 for test_idx in range(start,end):
                     knn = [neighbor for neighbor in self.train_sample_pair_wise_distance_matrix[test_idx] if neighbor < start or neighbor >= end][:k]
-                    print knn
                     label = self.getMajorityClassLabelsForKNN(knn, train_data_for_iter, train_result_for_iter)
                     test_label = self.train_result[test_idx]
                     if label != test_label:
                         error += 1
             train_error_for_each_k[k] = error
         plotErrorForK(self.possible_k_values, train_error_for_each_k.values())
+        self.k =  min(train_error_for_each_k.keys(), key = lambda key: train_error_for_each_k[key])
+        print 'Minimum error with k: ', self.k
 
 
     def fit(self, X, y):
