@@ -14,7 +14,7 @@ def plotErrorForK(ks, errors, train_errors, test_errors):
     ax.plot(ks, errors, label='CrossValidation Error', color='r')
     ax.plot(ks, train_errors, label='Train Error', color='b')
     ax.plot(ks, test_errors, label='Test Error', color='g')
-    imgFile = os.path.join(os.getcwd(), "Error plot")+'.png'
+    imgFile = os.path.join(os.getcwd(), "KNN Error plot")+'.png'
     art = []
     lgd = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1))
     art.append(lgd)
