@@ -16,17 +16,15 @@ def measureAccuracyOnTestData(knnClassifier):
     print accuracy
 
 
-matlab_data = scipy.io.loadmat(os.path.join(os.getcwd(),'resources/faces.mat'))
-train_data = matlab_data['traindata']
-train_result = numpy.array([labels[0] for labels in matlab_data['trainlabels']])
-test_data = matlab_data['testdata']
-test_result = numpy.array([labels[0] for labels in matlab_data['testlabels']])
+def extractData():
+    matlab_data = scipy.io.loadmat(os.path.join(os.getcwd(), 'resources/faces.mat'))
+    train_data = matlab_data['traindata']
+    train_result = numpy.array([labels[0] for labels in matlab_data['trainlabels']])
+    test_data = matlab_data['testdata']
+    test_result = numpy.array([labels[0] for labels in matlab_data['testlabels']])
+    return train_data, train_result, test_data, test_result
+
+train_data, train_result, test_data, test_result = extractData()
 knnClassifier = KNN(range(1,100), 10)
 knnClassifier.fit(train_data, train_result)
 measureAccuracyOnTestData(knnClassifier)
-
-
-# from sklearn.neighbors.classification import KNeighborsClassifier
-# knnClassifier = KNeighborsClassifier()
-# knnClassifier.fit(train_data, train_result)
-# measureAccuracyOnTestData(knnClassifier)
