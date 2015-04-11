@@ -2,6 +2,7 @@ __author__ = 'santhosh'
 
 import numpy
 import matplotlib.pyplot as plt
+import os
 
 
 def plotErrorForK(ks,errors):
@@ -11,7 +12,11 @@ def plotErrorForK(ks,errors):
     plt.xlabel('K')
     plt.ylabel('Error')
     ax.plot(ks, errors, label='CrossValidation Error')
-    plt.show()
+    imgFile = os.path.join(os.getcwd(), "Cross Validation Error")+'.png'
+    print "Cross Validation error plot logged to "+imgFile
+    plt.savefig(imgFile,\
+                 bbox_inches="tight")
+    plt.close()
 
 class KNN(object):
     def __init__(self, possible_k_values, cross_validation_fold):
