@@ -1,6 +1,17 @@
 __author__ = 'santhosh'
 
 import numpy
+import matplotlib.pyplot as plt
+
+
+def plotErrorForK(ks,errors):
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1)
+    plt.title('Cross Validation Error')
+    plt.xlabel('K')
+    plt.ylabel('Error')
+    ax.plot(ks, errors, label='CrossValidation Error')
+    plt.show()
 
 class KNN(object):
     def __init__(self, possible_k_values, cross_validation_fold):
@@ -21,7 +32,7 @@ class KNN(object):
         for i in range(n_samples):
             neighbor_distances = {j:self.cosine_distance(self.train_data[i], self.train_data[j])\
                                   for j in range(n_samples) if i != j}
-            neighbor_distances = sorted(list(neighbor_distances.keys()), lambda key : neighbor_distances[key])
+            neighbor_distances = sorted(list(neighbor_distances.keys()), key = lambda key : neighbor_distances[key])
             self.train_sample_pair_wise_distance_matrix[i] = neighbor_distances
 
         
@@ -53,7 +64,6 @@ class KNN(object):
                     if sample_idx<start or sample_idx>=end:
                         train_data_for_iter.append(self.train_data[sample_idx])
                         train_result_for_iter.append(self.train_result[sample_idx])
-
                 for test_idx in range(start,end):
                     knn = [i for i in self.train_sample_pair_wise_distance_matrix[test_idx] if i<start or i>=end][:k]
                     label = self.getMajorityClassLabelsForKNN(knn, self.train_data[test_idx],\
@@ -61,8 +71,8 @@ class KNN(object):
                     test_label = self.train_result[test_idx]
                     if label != test_label:
                         error +=1
-
             train_error_for_each_k[k] = error
+        plotErrorForK(self.possible_k_values, train_error_for_each_k)
 
 
     def fit(self, X, y):
@@ -82,6 +92,5 @@ class KNN(object):
         return max(class_labels.keys(), key = lambda key: class_labels[key])
 
     def predict(self, x):
-        knn  = self.findKNearestNeigbors(x)
+        knn = self.findKNearestNeigbors(x)
         return self.getMajorityClassLabelsForKNN(x, knn, self.train_data, self.train_result)
-
