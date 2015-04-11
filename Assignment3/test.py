@@ -11,4 +11,4 @@ train_result = numpy.array([labels[0] for labels in matlab_data['trainlabels']])
 test_data = matlab_data['testdata']
 test_result = numpy.array([labels[0] for labels in matlab_data['testlabels']])
 knnClassifier = KNN(range(1,100), 10)
-knnClassifier.fit(train_data,train_result)
+knnClassifier.fit(train_data, train_result)

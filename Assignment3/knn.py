@@ -58,22 +58,20 @@ class KNN(object):
             error = 0
             for i in range(len(test_idx_for_each_iter)):
                 start, end = test_idx_for_each_iter[i]
-                print start, end
                 train_data_for_iter, train_result_for_iter = [],[]
                 for sample_idx in range(n_samples):
-                    if sample_idx<start or sample_idx>=end:
+                    if sample_idx < start or sample_idx >= end:
                         train_data_for_iter.append(self.train_data[sample_idx])
                         train_result_for_iter.append(self.train_result[sample_idx])
                 for test_idx in range(start,end):
-                    knn = [i for i in self.train_sample_pair_wise_distance_matrix[test_idx] if i<start or i>=end][:k]
-                    label = self.getMajorityClassLabelsForKNN(knn, self.train_data[test_idx],\
-                                                      train_data_for_iter, train_result_for_iter)
+                    knn = [neighbor for neighbor in self.train_sample_pair_wise_distance_matrix[test_idx] if neighbor < start or neighbor >= end][:k]
+                    print knn
+                    label = self.getMajorityClassLabelsForKNN(knn, train_data_for_iter, train_result_for_iter)
                     test_label = self.train_result[test_idx]
                     if label != test_label:
-                        error +=1
+                        error += 1
             train_error_for_each_k[k] = error
-        print train_error_for_each_k
-        #plotErrorForK(self.possible_k_values, train_error_for_each_k)
+        plotErrorForK(self.possible_k_values, train_error_for_each_k.values())
 
 
     def fit(self, X, y):
@@ -82,7 +80,7 @@ class KNN(object):
         self.calculatePairWiseDistanceForTrainSamples()
         self.doNFoldCrossValidationAndMeasureK()
 
-    def getMajorityClassLabelsForKNN(self, x, knn, train_data, train_result):
+    def getMajorityClassLabelsForKNN(self, knn, train_data, train_result):
         class_labels = dict()
         for i in range(len(knn)):
             sample_idx = knn[i]
@@ -94,4 +92,4 @@ class KNN(object):
 
     def predict(self, x):
         knn = self.findKNearestNeigbors(x)
-        return self.getMajorityClassLabelsForKNN(x, knn, self.train_data, self.train_result)
+        return self.getMajorityClassLabelsForKNN(knn, self.train_data, self.train_result)
