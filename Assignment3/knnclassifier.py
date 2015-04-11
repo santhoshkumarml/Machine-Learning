@@ -113,7 +113,7 @@ class KNNClassifier(object):
         cross_validation_error_for_each_k = self.doNFoldCrossValidationAndMeasureK()
         train_error_for_each_k = []
         test_error_for_each_k = []
-        for k in range(self.possible_k_values):
+        for k in self.possible_k_values:
             train_error = self.predictAndScore(train_data, train_result, k)
             train_error_for_each_k.append(train_error)
             test_error = self.predictAndScore(test_data, test_result, k)
