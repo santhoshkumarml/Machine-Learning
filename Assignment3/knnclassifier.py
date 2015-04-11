@@ -116,7 +116,7 @@ class KNNClassifier(object):
         knn = self.findKNearestNeigbors(x, k)
         return self.getMajorityClassLabelsForKNN(knn, self.train_data, self.train_result)
 
-    def score(self, labels, result, k):
+    def score(self, labels, result):
         error = 0.0
         for i in range(len(labels)):
             if labels[i] != result[i]:
