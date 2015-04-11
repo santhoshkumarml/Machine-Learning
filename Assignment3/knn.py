@@ -3,49 +3,75 @@ __author__ = 'santhosh'
 import numpy
 
 class KNN(object):
-    def __init__(self):
+    def __init__(self, possible_k_values, cross_validation_fold):
         self.train_data = []
         self.train_sample_pair_wise_distance_matrix = {}
         self.train_result = []
-        self. k = 10
+        self.nFold = cross_validation_fold
+        self.possible_k_values = possible_k_values
+        self.k = -1
         
     def cosine_distance(self,x,y):
         denom = numpy.sqrt(numpy.dot(x,x)*numpy.dot(y,y))
         distance = 1 -(numpy.dot(x,y)/denom)
         return distance
     
-    def fixK(self, k):
-        self.k = k
-    
     def calculatePairWiseDistanceForTrainSamples(self):
         n_samples, n_features = self.train_data.shape
-        self.train_sample_pair_wise_distance_matrix = {i:{j:self.cosine_distance(self.train_data[i], self.train_data[j])\
-                                                           for j in range(n_samples) if i != j} for i in range(n_samples)}
+        for i in range(n_samples):
+            neighbor_distances = {j:self.cosine_distance(self.train_data[i], self.train_data[j])\
+                                  for j in range(n_samples) if i != j}
+            neighbor_distances = sorted(list(neighbor_distances.keys()), lambda key : neighbor_distances[key])
+            self.train_sample_pair_wise_distance_matrix[i] = neighbor_distances
+
         
-    def findKNearestNeigbors(self, x, k = None, leaveIndicesOnTrainSamples = []):
+    def findKNearestNeigbors(self, x, k = None):
         if k == None:
             k = self.k
         n_samples, n_features = self.train_data.shape
         neighbor_distances_dict = dict()
         for i in range(n_samples):
-            if i not in leaveIndicesOnTrainSamples:
-                train_vector = self.train_data[i]
-                distance_for_this_sample = self.cosine_distance(train_vector, x)
-                neighbor_distances_dict[i] = distance_for_this_sample
-        
+            train_vector = self.train_data[i]
+            distance_for_this_sample = self.cosine_distance(train_vector, x)
+            neighbor_distances_dict[i] = distance_for_this_sample
         neighbors_array = sorted(list(neighbor_distances_dict.keys()), key = lambda key: neighbor_distances_dict[key])
         return neighbors_array[:k]
-    
+
+    def doNFoldCrossValidationAndMeasureK(self):
+        n_samples, n_features = self.train_data.shape
+        partition_size = n_samples/self.nFold
+        test_idx_for_each_iter = []
+        for i in range(0, n_samples, partition_size):
+            test_idx_for_each_iter.append((i,i+partition_size))
+        train_error_for_each_k = dict()
+        for k in self.possible_k_values:
+            error = 0
+            for i in range(len(test_idx_for_each_iter)):
+                start, end = test_idx_for_each_iter[i]
+                train_data_for_iter, train_result_for_iter = [],[]
+                for sample_idx in range(n_samples):
+                    if sample_idx<start or sample_idx>=end:
+                        train_data_for_iter.append(self.train_data[sample_idx])
+                        train_result_for_iter.append(self.train_result[sample_idx])
+
+                for test_idx in range(start,end):
+                    knn = [i for i in self.train_sample_pair_wise_distance_matrix[test_idx] if i<start or i>=end][:k]
+                    label = self.getMajorityClassLabelsForKNN(knn, self.train_data[test_idx],\
+                                                      train_data_for_iter, train_result_for_iter)
+                    test_label = self.train_result[test_idx]
+                    if label != test_label:
+                        error +=1
+
+            train_error_for_each_k[k] = error
+
+
     def fit(self, X, y):
         self.train_data = X
         self.train_result = y
         self.calculatePairWiseDistanceForTrainSamples()
-        for i in range(100):
-            self.k = i
-            
-    
-    def predict(self, x):
-        knn  = self.findKNearestNeigbors(x)
+        self.doNFoldCrossValidationAndMeasureK()
+
+    def getMajorityClassLabelsForKNN(self, x, knn, train_data, train_result):
         class_labels = dict()
         for i in range(len(knn)):
             sample_idx = knn[i]
@@ -53,6 +79,9 @@ class KNN(object):
             if label not in class_labels:
                 class_labels[label] = 0
             class_labels[label] += 1
-            
         return max(class_labels.keys(), key = lambda key: class_labels[key])
+
+    def predict(self, x):
+        knn  = self.findKNearestNeigbors(x)
+        return self.getMajorityClassLabelsForKNN(x, knn, self.train_data, self.train_result)
 
