@@ -3,6 +3,7 @@ __author__ = 'santhosh'
 import numpy
 import matplotlib.pyplot as plt
 import os
+import random
 
 
 def plotErrorForK(ks, errors, train_errors, test_errors):
@@ -57,48 +58,59 @@ class KNNClassifier(object):
             key = lambda key: neighbor_distances_dict[key])
         return neighbors_array[:k]
 
+    def doCrossValiationForK(self, k, test_idx_for_each_iter):
+        n_samples, n_features = self.train_data.shape
+        cross_validation_error = 0.0
+        train_error = 0.0
+        for sample_idx in range(n_samples):
+            knn_for_train = [neighbor for neighbor in self.train_sample_pair_wise_distance_matrix[sample_idx]][:k]
+            label = self.getMajorityClassLabelsForKNN(knn_for_train, \
+                                                      self.train_data[sample_idx], \
+                                                      self.train_result[sample_idx])
+            if label != self.train_result[sample_idx]:
+                train_error += 1.0
+        for i in range(len(test_idx_for_each_iter)):
+            test_idxs = test_idx_for_each_iter[i]
+            train_data_for_iter, train_result_for_iter = [], []
+            for sample_idx in range(n_samples):
+                if sample_idx not in test_idxs:
+                    train_data_for_iter.append(self.train_data[sample_idx])
+                    train_result_for_iter.append(self.train_result[sample_idx])
+            for test_idx in test_idxs:
+                knn = [neighbor for neighbor in \
+                       self.train_sample_pair_wise_distance_matrix[test_idx] \
+                       if neighbor not in test_idxs][:k]
+                label = self.getMajorityClassLabelsForKNN(knn, train_data_for_iter, train_result_for_iter)
+                test_label = self.train_result[test_idx]
+                if label != test_label:
+                    cross_validation_error += 1
+        return cross_validation_error, train_error
+
     def doNFoldCrossValidationAndMeasureK(self):
         n_samples, n_features = self.train_data.shape
         partition_size = n_samples/self.nFold
-        test_idx_for_each_iter = []
-        for i in range(0, n_samples, partition_size):
-            test_idx_for_each_iter.append((i,i+partition_size))
+        test_idx_for_each_iter = [set() for fold in range(self.nFold)]
+        random_idxs = range(n_samples)
+        # random_idxs = random.sample(xrange(n_samples), n_samples)
+        print random_idxs
+        itr = 0
+        for i in range(0, n_samples):
+            if len(test_idx_for_each_iter[itr]) != partition_size:
+                test_idx_for_each_iter[itr].add(random_idxs[i])
+            else:
+                itr+=1
         cross_validation_error_for_each_k = dict()
         train_error_for_each_k = []
+
         for k in self.possible_k_values:
-            cross_validation_error = 0.0
-            train_error = 0.0
-
-            for sample_idx in range(n_samples):
-                knn_for_train = [neighbor for neighbor in self.train_sample_pair_wise_distance_matrix[sample_idx]][:k]
-                label = self.getMajorityClassLabelsForKNN(knn_for_train,\
-                                                          self.train_data[sample_idx],\
-                                                          self.train_result[sample_idx])
-                if label != self.train_result[sample_idx]:
-                    train_error += 1.0
-
-            for i in range(len(test_idx_for_each_iter)):
-                start, end = test_idx_for_each_iter[i]
-                train_data_for_iter, train_result_for_iter = [],[]
-                for sample_idx in range(n_samples):
-                    if sample_idx < start or sample_idx >= end:
-                        train_data_for_iter.append(self.train_data[sample_idx])
-                        train_result_for_iter.append(self.train_result[sample_idx])
-                for test_idx in range(start, end):
-                    knn = [neighbor for neighbor in\
-                           self.train_sample_pair_wise_distance_matrix[test_idx]\
-                           if neighbor < start or neighbor >= end][:k]
-                    label = self.getMajorityClassLabelsForKNN(knn, train_data_for_iter, train_result_for_iter)
-                    test_label = self.train_result[test_idx]
-                    if label != test_label:
-                        cross_validation_error += 1
+            cross_validation_error, train_error = self.doCrossValiationForK(k, test_idx_for_each_iter)
             cross_validation_error_for_each_k[k] = cross_validation_error/n_samples
             train_error /= n_samples
             train_error_for_each_k.append(train_error)
 
-        # self.k = min(cross_validation_error_for_each_k.keys(),\
-        #     key = lambda key: cross_validation_error_for_each_k[key])
-        # print 'Minimum error with k: ', self.k
+        self.k = min(cross_validation_error_for_each_k.keys(),\
+            key = lambda key: cross_validation_error_for_each_k[key])
+        print 'Minimum error with k: ', self.k
 
         return cross_validation_error_for_each_k.values(), train_error_for_each_k
 
