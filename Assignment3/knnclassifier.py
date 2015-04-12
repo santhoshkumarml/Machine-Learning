@@ -86,7 +86,7 @@ class KNNClassifier(object):
                     cross_validation_error += 1
         return cross_validation_error, train_error
 
-    def doNFoldCrossValidationAndMeasureK(self):
+    def doNFoldCrossValidation(self):
         n_samples, n_features = self.train_data.shape
         partition_size = n_samples/self.nFold
         test_idx_for_each_iter = [set() for fold in range(self.nFold)]
@@ -143,7 +143,7 @@ class KNNClassifier(object):
         self.train_result = train_result
         self.calculatePairWiseDistanceForTrainSamples()
 
-        cross_validation_error_for_each_k, train_error_for_each_k = self.doNFoldCrossValidationAndMeasureK()
+        cross_validation_error_for_each_k, train_error_for_each_k = self.doNFoldCrossValidation()
         test_error_for_each_k = []
         knn_for_test_data = {}
 
