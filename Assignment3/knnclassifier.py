@@ -92,7 +92,6 @@ class KNNClassifier(object):
         test_idx_for_each_iter = [set() for fold in range(self.nFold)]
         random_idxs = range(n_samples)
         # random_idxs = random.sample(xrange(n_samples), n_samples)
-        print random_idxs
         itr = 0
         for i in range(0, n_samples):
             if len(test_idx_for_each_iter[itr]) != partition_size:
