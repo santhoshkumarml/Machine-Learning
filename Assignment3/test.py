@@ -20,13 +20,13 @@ def extractData():
     return train_data, train_result, test_data, test_result
 
 print '----------------------------------------------------------------------------------------'
-print 'Question 1'
-beforeTime = datetime.now()
+# print 'Question 1'
+# beforeTime = datetime.now()
 train_data, train_result, test_data, test_result = extractData()
-knnClassifier = KNNClassifier(range(1,100), 10)
-knnClassifier.fitPredictAndScore(train_data, train_result, test_data, test_result)
-afterTime = datetime.now()
-print 'Time Taken', afterTime - beforeTime
+# knnClassifier = KNNClassifier(range(1,100), 10)
+# knnClassifier.fitPredictAndScore(train_data, train_result, test_data, test_result)
+# afterTime = datetime.now()
+# print 'Time Taken', afterTime - beforeTime
 print '----------------------------------------------------------------------------------------'
 print 'Question 2'
 beforeTime = datetime.now()
@@ -51,19 +51,19 @@ def doNFoldCrossValidation(n, train_data, train_result, c=1):
         train_ins = train_data[sample_idx]
         if svm_classifier_for_train_error.predict(train_ins) != train_result[sample_idx]:
             train_error += 1.0
-        for i in range(len(test_idx_for_each_iter)):
-            test_idxs = test_idx_for_each_iter[i]
-            train_data_for_iter, train_result_for_iter = [], []
-            for sample_idx in range(n_samples):
-                if sample_idx not in test_idxs:
-                    train_data_for_iter.append(train_data[sample_idx])
-                    train_result_for_iter.append(train_result[sample_idx])
-            svm_classifier.fit(train_data_for_iter, train_result_for_iter)
-            for test_idx in test_idxs:
-                test_label = train_result[test_idx]
-                label = svm_classifier.predict(train_data[test_idx])
-                if label != test_label:
-                    cross_validation_error += 1
+    for i in range(len(test_idx_for_each_iter)):
+        test_idxs = test_idx_for_each_iter[i]
+        train_data_for_iter, train_result_for_iter = [], []
+        for sample_idx in range(n_samples):
+            if sample_idx not in test_idxs:
+                train_data_for_iter.append(train_data[sample_idx])
+                train_result_for_iter.append(train_result[sample_idx])
+        svm_classifier.fit(train_data_for_iter, train_result_for_iter)
+        for test_idx in test_idxs:
+            test_label = train_result[test_idx]
+            label = svm_classifier.predict(train_data[test_idx])
+            if label != test_label:
+                cross_validation_error += 1
     cross_validation_error /= n_samples
     train_error /= n_samples
     return cross_validation_error, train_error
@@ -80,10 +80,11 @@ cross_validation_errors = []
 train_errors = []
 test_errors = []
 for c in cs:
+    print 'c:', c
     cross_validation_error, train_error = doNFoldCrossValidation(10, train_data, train_result, c)
     svm_classifier = svm.LinearSVC(C=c)
     svm_classifier.fit(train_data, train_result)
-    test_error = util.measureTestError(test_data, test_result)
+    test_error = util.measureTestError(test_data, test_result, svm_classifier)
     cross_validation_errors.append(cross_validation_error)
     train_errors.append(train_error)
     test_errors.append(test_error)
