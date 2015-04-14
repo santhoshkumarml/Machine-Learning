@@ -20,13 +20,13 @@ def extractData():
     return train_data, train_result, test_data, test_result
 
 print '----------------------------------------------------------------------------------------'
-# print 'Question 1'
-# beforeTime = datetime.now()
+print 'Question 1'
+beforeTime = datetime.now()
 train_data, train_result, test_data, test_result = extractData()
-# knnClassifier = KNNClassifier(range(1,100), 10)
-# knnClassifier.fitPredictAndScore(train_data, train_result, test_data, test_result)
-# afterTime = datetime.now()
-# print 'Time Taken', afterTime - beforeTime
+knnClassifier = KNNClassifier(range(1,100), 10)
+knnClassifier.fitPredictAndScore(train_data, train_result, test_data, test_result)
+afterTime = datetime.now()
+print 'Time Taken', afterTime - beforeTime
 print '----------------------------------------------------------------------------------------'
 print 'Question 2'
 beforeTime = datetime.now()
