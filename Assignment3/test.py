@@ -61,7 +61,7 @@ def doNFoldCrossValidation(n, train_data, train_result, c=1):
             svm_classifier.fit(train_data_for_iter, train_result_for_iter)
             for test_idx in test_idxs:
                 test_label = train_result[test_idx]
-                label = svm_classifier.predict(test_data[test_idx])
+                label = svm_classifier.predict(train_data[test_idx])
                 if label != test_label:
                     cross_validation_error += 1
     cross_validation_error /= n_samples

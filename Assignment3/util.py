@@ -20,7 +20,7 @@ def plotErrorForK(ks, errors, train_errors, test_errors, algo = 'KNN'):
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1)
     plt.title('Error Plot')
-    plt.xlabel('K')
+    plt.xlabel('Parameter - LOG(C) or K')
     plt.ylabel('Error')
     ax.plot(ks, errors, label='CrossValidation Error', color='r')
     ax.plot(ks, train_errors, label='Train Error', color='b')
