@@ -1,29 +1,8 @@
 __author__ = 'santhosh'
 
 import numpy
-import matplotlib.pyplot as plt
-import os
 import random
-
-
-def plotErrorForK(ks, errors, train_errors, test_errors):
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    plt.title('Error Plot')
-    plt.xlabel('K')
-    plt.ylabel('Error')
-    ax.plot(ks, errors, label='CrossValidation Error', color='r')
-    ax.plot(ks, train_errors, label='Train Error', color='b')
-    ax.plot(ks, test_errors, label='Test Error', color='g')
-    imgFile = os.path.join(os.getcwd(), "KNN Error plot")+'.png'
-    art = []
-    lgd = plt.legend(loc=9, bbox_to_anchor=(0.5, -0.1))
-    art.append(lgd)
-    plt.tight_layout()
-    print "Error plot logged to "+imgFile
-    plt.savefig(imgFile,\
-                 bbox_inches="tight")
-    plt.close()
+import util
 
 class KNNClassifier(object):
     def __init__(self, possible_k_values, cross_validation_fold):
@@ -91,7 +70,7 @@ class KNNClassifier(object):
         partition_size = n_samples/self.nFold
         test_idx_for_each_iter = [set() for fold in range(self.nFold)]
         random_idxs = range(n_samples)
-        # random_idxs = random.sample(xrange(n_samples), n_samples)
+        random_idxs = random.sample(xrange(n_samples), n_samples)
         itr = 0
         for i in range(0, n_samples):
             if len(test_idx_for_each_iter[itr]) != partition_size:
@@ -155,5 +134,5 @@ class KNNClassifier(object):
                       for test_idx in range(len(test_data))]
             test_error = self.score(labels, test_result)
             test_error_for_each_k.append(test_error)
-        plotErrorForK(self.possible_k_values, cross_validation_error_for_each_k,\
+        util.plotErrorForK(self.possible_k_values, cross_validation_error_for_each_k,\
                       train_error_for_each_k, test_error_for_each_k)
