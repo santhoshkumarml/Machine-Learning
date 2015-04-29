@@ -1,14 +1,15 @@
 __author__ = 'santhosh'
 
 import numpy
-import scipy
 import matplotlib.pyplot as plt
-from scipy.sparse import linalg
 
 class Graph():
     def __init__(self):
         self.nodes = dict()
         self.edges = dict()
+
+    def get_nodes(self):
+        return self.nodes.values()
 
     def add_node(self, node):
         self.nodes[node] = node
@@ -41,23 +42,6 @@ class Graph():
         return numpy.subtract(D, W)
 
 
-class SpectralClustering:
-    def __init__(self, graph):
-        self.graph = graph
-
-    def findEigenValuesAndEigenVectors(self, top):
-        laplacian = self.graph.getUnnormalizedLaplacianMatrix()
-        # eig_va, eig_vector = numpy.linalg.eig(laplacian)
-        # sorted_order = sorted(range(10), key= lambda key: eig_va[key])
-        A = numpy.ndarray.astype(laplacian, dtype='float')
-        eig_va, eig_vector = numpy.linalg.eig(laplacian)
-        sorted_order = sorted(range(10), key= lambda key: eig_va[key])
-        result = []
-        for i in range(10):
-            idx = sorted_order[i]
-            result.append((eig_va[idx], eig_vector[idx]))
-        return result
-
 def plotEigenValue(eigen_vector):
     fig = plt.figure()
     ax1 = fig.add_subplot(1, 1, 1)
@@ -80,11 +64,19 @@ for edge in edges:
     node1, node2 = edge
     graph.add_edge(node1, node2)
 
-spc = SpectralClustering(graph)
-result = spc.findEigenValuesAndEigenVectors(2)
-for eig_val, eig_vector in result:
-    plotEigenValue(eig_vector)
+n_clusters = 2
+n_nodes = len(graph.get_nodes())
 
-# from sklearn.cluster.spectral import spectral_clustering as spcl
-# labels = spcl(graph.get_adjacency_matrix(),n_clusters=2)
-# print labels
+laplacian = graph.getUnnormalizedLaplacianMatrix()
+A = numpy.ndarray.astype(laplacian, dtype='float')
+eig_vals, eig_vectors = numpy.linalg.eigh(A)
+
+second_eig_vector = eig_vectors[:,1]
+plotEigenValue(second_eig_vector)
+
+# for col in range(10):
+#     eig_val = eig_vals[col]
+#     eig_vector = eig_vectors[:,col]
+#     print eig_val, eig_vector
+#     plotEigenValue(eig_vector)
+
