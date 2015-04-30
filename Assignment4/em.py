@@ -2,6 +2,8 @@ __author__ = 'santhosh'
 
 import numpy
 import math
+from matplotlib import mlab
+from matplotlib import pyplot as plt
 
 class EM:
     def __init__(self, means, thetas, data):
@@ -17,10 +19,9 @@ class EM:
         prob = theta*math.exp(-(((self.data[train_ins_idx] - mean)**2)/2))
         return prob
 
-
     def calculateClassConditionalProbability(self, train_ins_idx):
-        c_p_1 = self.thetas[0]*math.exp(-(((self.data[train_ins_idx] - self.means[0])**2)/2))
-        c_p_2 = self.thetas[1]*math.exp(-(((self.data[train_ins_idx] - self.means[1])**2)/2))
+        c_p_1 = self.thetas[0]*(1/math.sqrt(2*math.pi))*math.exp(-(((self.data[train_ins_idx] - self.means[0])**2)/2))
+        c_p_2 = self.thetas[1]*(1/math.sqrt(2*math.pi))*math.exp(-(((self.data[train_ins_idx] - self.means[1])**2)/2))
         denom = c_p_1+c_p_2
         return c_p_1/denom, c_p_2/denom
 
@@ -52,7 +53,7 @@ class EM:
     def EM_ALGO(self):
         while True:
             current_likelihood = self.E_STEP();
-            print current_likelihood, self.max_likelihood
+            # print current_likelihood, self.max_likelihood
             if current_likelihood < self.max_likelihood:
                 break
             self.max_likelihood = current_likelihood
@@ -60,9 +61,60 @@ class EM:
         return self.means, self.thetas
 
 
+def runEM(data):
+    means = (1, 2)
+    thetas = (0.33, 0.67)
+    em = EM(means, thetas, data)
+    (mean1, mean2), (theta1, theta2) = em.EM_ALGO()
+    print 'Means:', mean1, mean2
+    print 'Thetas:', theta1, theta2
+    return (mean1, mean2), (theta1, theta2)
+
+def plotHistoGramAndDensity(data, mean1, mean2, theta1, theta2):
+    plt.hist(data, range=[-5, 6])
+    plt.title("Histogram")
+    plt.xlabel("Value")
+    plt.ylabel("Frequency")
+    plt.savefig('Historgram.png')
+    plt.close()
+
+    data1 = [i for i in numpy.arange(-5, 6, 0.0011)] #same as number of data points
+
+    norm1 = mlab.normpdf(data1, mean1, 1)
+    norm2 = mlab.normpdf(data1, mean2, 1)
+
+    density = [0 for i in range(len(data1))]
+    for i in range(len(data1)):
+        density[i] = norm1[i] * theta1 + norm2[i] * theta2
+
+    plt.title("Density")
+    plt.ylabel("Frequency")
+    plt.plot(data1, density)
+    plt.savefig('Density.png')
+    plt.close()
+
+
+def plotContour(data, thetas):
+    x = [i for i in numpy.arange(-1, 4, 0.25)]
+    y = [i for i in numpy.arange(-1, 4, 0.25)]
+    size = len(x)
+    z = numpy.zeros(shape=(size, size))
+    for i in range(size):
+        for j in range(size):
+            em = EM((x[i], y[j]), thetas, data)
+            likelihood = em.E_STEP()
+            z[i][j] = likelihood
+
+    fig = plt.figure()
+    CS = plt.contour(x, y, z)
+    plt.clabel(CS, inline=1, fontsize=10)
+    plt.title('Contour Plot of Means and Likelihood')
+    plt.savefig('Contour.png')
+    plt.close()
+
 with open('hw5.data.txt') as f:
     data = [float(line.strip()) for line in f.readlines()]
-means = (1,2)
-thetas = (0.33,0.67)
-em = EM(means, thetas, data)
-print em.EM_ALGO()
+
+(mean1, mean2), (theta1, theta2) = runEM(data)
+plotHistoGramAndDensity(data, mean1, mean2, theta1, theta2)
+plotContour(data, (theta1, theta2))

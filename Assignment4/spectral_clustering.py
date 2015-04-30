@@ -49,7 +49,8 @@ def plotEigenValue(eigen_vector):
     plt.xlabel('Node')
     plt.ylabel('Eigen Vector')
     ax1.plot(range(1, 11), eigen_vector)
-    plt.show()
+    plt.savefig('Spectral Clustering - EigenVector.png')
+    plt.close()
 
 
 nodes = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -64,6 +65,11 @@ for edge in edges:
     node1, node2 = edge
     graph.add_edge(node1, node2)
 
+print 'Adjacency Matrix:'
+print graph.get_adjacency_matrix()
+print 'Unnormalized Graph Laplacian:'
+print graph.getUnnormalizedLaplacianMatrix()
+
 n_clusters = 2
 n_nodes = len(graph.get_nodes())
 
@@ -73,6 +79,7 @@ eig_vals, eig_vectors = numpy.linalg.eigh(A)
 
 second_eig_vector = eig_vectors[:,1]
 plotEigenValue(second_eig_vector)
+
 
 # for col in range(10):
 #     eig_val = eig_vals[col]
