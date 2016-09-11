@@ -15,3 +15,5 @@ local.properties
 .project
 /RemoteSystemsTempFiles/
 *.iml
+.DS_Store
+**/build/*
