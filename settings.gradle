@@ -1,1 +1,1 @@
-include ':scala:common', ':scala:logistic_regression'
+include ':scala:common', ':scala:linear_regression', ':scala:logistic_regression'

@@ -7,6 +7,10 @@ subprojects {
 
     dependencies {
         compile 'org.scala-lang:scala-library:2.11.1'
+        testCompile 'junit:junit:4.10'
+        testCompile 'org.scalatest:scalatest_2.11:2.1.+'
     }
 }
+
+group = 'com.mlalgos'
 

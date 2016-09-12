@@ -1,3 +1,4 @@
 dependencies {
     compile 'org.nd4j:nd4s_2.11:0.5.0'
 }
+group = 'com.mlalgos'
