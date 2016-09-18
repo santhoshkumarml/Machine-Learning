@@ -4,7 +4,7 @@ import com.mlalgos.common.SupervisedModel
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 
-final class LogisticRegression(private var w : INDArray) extends SupervisedModel{
+final class LogisticRegressionClassifier(private var w : INDArray) extends SupervisedModel{
   /**
     * Train the model
     *
