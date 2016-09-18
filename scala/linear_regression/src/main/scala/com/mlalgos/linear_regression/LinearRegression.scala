@@ -1,10 +1,10 @@
-package com.mlalgos.logistic_regression
+package com.mlalgos.linear_regression
 
 import com.mlalgos.common.SupervisedModel
 import org.nd4j.linalg.api.ndarray.INDArray
 import org.nd4j.linalg.factory.Nd4j
 
-final class LogisticRegression(private var w : INDArray) extends SupervisedModel{
+final class LinearRegression(private var w : INDArray) extends SupervisedModel{
   /**
     * Train the model
     *
