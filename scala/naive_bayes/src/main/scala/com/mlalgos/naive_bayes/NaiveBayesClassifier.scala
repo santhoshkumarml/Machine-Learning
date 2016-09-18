@@ -1,5 +1,9 @@
 package com.mlalgos.naive_bayes
 
+import com.mlalgos.common.SupervisedModel
+import org.nd4j.linalg.api.ndarray.INDArray
+import org.nd4j.linalg.factory.Nd4j
+
 final class NaiveBayesClassifier(private var w : INDArray) extends SupervisedModel{
   /**
     * Train the model
