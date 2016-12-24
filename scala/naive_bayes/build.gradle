@@ -2,4 +2,8 @@ dependencies {
     compile project(':scala:common')
 }
 
+test {
+    testLogging.showStandardStreams = true
+}
+
 group = 'com.mlalgos'
